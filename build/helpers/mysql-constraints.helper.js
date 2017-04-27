@@ -86,6 +86,8 @@ var MysqlConstraintsHelper = {
    */
 
   convertToRightPartOfConstraint: function convertToRightPartOfConstraint(data) {
+    var _this = this;
+
     if (typeof data === 'string' || typeof data === 'number') {
       return ' = ' + this.formatElement(data);
     }
@@ -115,7 +117,9 @@ var MysqlConstraintsHelper = {
     }
 
     if (data.$in) {
-      return this.generateIds(data.$in);
+      return this.generateIds(data.$in.map(function (e) {
+        return _this.formatElement(e);
+      }));
     }
 
     throw new Error('Unrecognized pattern ' + JSON.stringify(data));
