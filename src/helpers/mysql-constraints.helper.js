@@ -4,6 +4,11 @@
  */
 
 const MysqlConstraintsHelper = {
+  /**
+   * @function MysqlConstraintsHelper.generateSelectConstraints
+   * @description Function that generates MySQL constraints for query. You can pass loopback-like filters or just a string with your own constraints.
+   * @param {object|string} constraints - constraints to add to the query.
+   */
   generateSelectConstraints (constraints) {
     if (!constraints) {
       return '';
@@ -15,6 +20,13 @@ const MysqlConstraintsHelper = {
 
     return ` WHERE ${this.convertObjectToConstraints(constraints)}`;
   },
+
+  /**
+   * @function MysqlConstraintsHelper.convertObjectToConstraints
+   * @description Function that converts loopback-like filters into MySQL constraints.
+   * @param {object} constraints - loopback-like constraint to convert to MySQL ones
+   * @param {string} toJOIN - What do we use as separator for queries. AND is default. Is used in recursive calls.
+   */
 
   convertObjectToConstraints (constraints, toJOIN = 'AND') {
     let selectConstraints = [];
@@ -39,6 +51,12 @@ const MysqlConstraintsHelper = {
     
     return selectConstraints.join(` ${toJOIN} `);
   },
+
+  /**
+   * @function MysqlConstraintsHelper.convertToRightPartOfConstraint
+   * @description Converts loopback-like element of the constraint to MySQL one. Example: {$like: '1'} -> " LIKE '1'"
+   * @param {object|string} data - one simple loopback-like element of the constraint.
+   */
 
   convertToRightPartOfConstraint (data) {
     if (typeof data === 'string' || typeof data === 'number') {
@@ -97,6 +115,12 @@ const MysqlConstraintsHelper = {
 
     return ` = ${currentData}`;
   },
+
+  /**
+   * @function MysqlConstraintsHelper.formatElement
+   * @description Transforms JS object into string for MySQL
+   * @param {string|Date|Array|Object} element - element to transform into string
+   */
 
   formatElement (element) {
     if (typeof element === 'string') {

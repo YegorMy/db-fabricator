@@ -4,7 +4,7 @@ const Adapter = require('./general.adapter');
 
 /**
  * @class MySQLAdapter
- * @description Connecter for MySQL database
+ * @description Adapter for MySQL database
  */
 
 class MySQLAdapter extends Adapter {
@@ -106,6 +106,17 @@ class MySQLAdapter extends Adapter {
   update (table, fields, constraints) {
     return this.waitForConnect().then(() => {
       return this.connection.query(MySQLHelper.generateUpdateQuery(table, fields, constraints));
+    });
+  }
+
+  /**
+   * @function MySQLAdapter.cose
+   * @description Closes connection to MySQL database
+   */
+
+  disconnect () {
+    return this.waitForConnect().then( () => {
+      return this.connection.connection.close();
     });
   }
 }

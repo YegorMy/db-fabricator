@@ -54,6 +54,12 @@ const MySQLHelper = {
     
     return query;
   },
+  
+  /**
+   * @function MySQLHelper.generateValues
+   * @description Transforms key:value pair into mysql INSERT part of the query. Example {key: 'value'} -> (key) VALUES("value")
+   * @param {object} data - key:value pair to transform
+   */
 
   generateValues (data) {
     const keys = Object.keys(data);
@@ -68,6 +74,12 @@ const MySQLHelper = {
     return `${resultQuery} VALUES(${values.join(', ')})`;
   },
 
+  /**
+   * @function MySQLHelper.generateUpdateFields
+   * @description Transforms key:value pair into mysql UPDATE part of the query. Example {key: 'value'} -> `key` = "value"
+   * @param {object} data - key:value pair to transform
+   */
+
   generateUpdateFields (data) {
     const keys = Object.keys(data);
     const values = [];
@@ -78,6 +90,12 @@ const MySQLHelper = {
 
     return values.join(', ');
   },
+
+  /**
+   * @function MySQLHelper.generateSelectFields
+   * @description Transforms array into mysql SELECT part of the query. Example ['field1', 'field2'] -> `fields1`,`field2`. Transforms null into '*'.
+   * @param {array|null} data - array or null to transform
+   */
 
   generateSelectFields (data) {
     if (!data) {
