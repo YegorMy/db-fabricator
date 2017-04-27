@@ -326,7 +326,7 @@ var Fabricator = function () {
 
       return this.adapter.create(table, data).then(function (insertedData) {
         _this2.saveSessionData(table, insertedData);
-        return true;
+        return insertedData[0];
       });
     }
   }, {

@@ -187,7 +187,7 @@ class Fabricator {
   create (table, data) {
     return this.adapter.create(table, data).then((insertedData) => {
       this.saveSessionData(table, insertedData);
-      return true;
+      return insertedData[0];
     });
   };
 
