@@ -146,16 +146,16 @@ console.log('connection closed');
 
 You can create loopback-like constraints or your own by simply passing an SQL WHERE string.
 List of avaliable filters:
-- `equals` - {id: 1} coverts to ``\id`\ = 1`
-- `$gt` - {id: {$gt: 1}} converts to `\`id\` > 1`
-- `$gte` - {id: {$gte: 1}} converts to `\`id\` >= 1`
-- `$lt` - {id: {$lt: 1}} converts to `\`id\` < 1`
-- `$lte` - {id: {$gt: 1}} converts to `\`id\` <= 1`
-- `$ne` - {id: {$gt: 1}} converts to `\`id\` <> 1`
-- `$like` - {id: {$like: `%12%5`}} converts to `\`id\` like '%12%5'`
-- `$in` - {id: {$in: [1,2,3,4,5]}} converts to `\`id\` IN (1,2,3,4,5)`. {id: {$in:[1]}} coverts to `\`id\` = 1`
-- `$and` - can be nested. {$and: [{id: 1}, {name: '123'}]} converts to `(\`id\` = 1 AND \`name\` = '123')`
-- `$or` - can be nexted. {$or: [{id: 1}, {name: '123'}]} converts to `(\`id\` = 1 OR \`name\` = '123')`
+- `equals` - {id: 1} coverts to `` `id` = 1``
+- `$gt` - {id: {$gt: 1}} converts to `` `id` > 1``
+- `$gte` - {id: {$gte: 1}} converts to `` `id` >= 1``
+- `$lt` - {id: {$lt: 1}} converts to `` `id` < 1``
+- `$lte` - {id: {$gt: 1}} converts to `` `id` <= 1``
+- `$ne` - {id: {$gt: 1}} converts to `` `id` <> 1``
+- `$like` - {id: {$like: `%12%5`}} converts to `` `id` like '%12%5'``
+- `$in` - {id: {$in: [1,2,3,4,5]}} converts to `` `id` IN (1,2,3,4,5)``. {id: {$in:[1]}} coverts to `` `id` = 1``
+- `$and` - can be nested. {$and: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 AND `name` = '123')``
+- `$or` - can be nexted. {$or: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 OR `name` = '123')``
 
 ## Constraints nesting
 
