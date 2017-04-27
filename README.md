@@ -1,6 +1,7 @@
 # Fabricate and delete your data on integration testing.
 
 `npm i db-fabricate`
+
 `yarn add db-fabricate`
 
 ## What's it?
