@@ -1,5 +1,9 @@
 # Fabricate and delete your data on integration testing.
 
+`npm i db-fabricate`
+
+`yarn add db-fabricate`
+
 ## What's it?
 `db-fabricator` is a simple node.js module that can create, update and delete data and also manipulate created and updated data during sessions.
 
@@ -137,7 +141,6 @@ Closes connection to current database.
 Fabricator.closeConnection();
 console.log('connection closed');
 ```
-
 
 # Constraints for `Fabricator.update`
 
