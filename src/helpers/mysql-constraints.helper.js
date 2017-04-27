@@ -88,7 +88,7 @@ const MysqlConstraintsHelper = {
     }
 
     if (data.$in) {
-      return this.generateIds(data.$in);
+      return this.generateIds(data.$in.map(e => this.formatElement(e)));
     }
 
     throw new Error(`Unrecognized pattern ${JSON.stringify(data)}`);
