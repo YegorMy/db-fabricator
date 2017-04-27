@@ -1,6 +1,6 @@
 {
-  "name": "db-fabricator",
-  "version": "1.0.0",
+  "name": "db-fabricate",
+  "version": "1.0.1",
   "description": "Fabricate data in your MySQL DB",
   "main": "index.js",
   "scripts": {
@@ -20,15 +20,13 @@
     "test",
     "test"
   ],
-  "author": "yegorMY <yegormy@gmail.com>",
+  "author": "yegormy <egorsm00@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/YegorMy/db-fabricator/issues"
   },
   "homepage": "https://github.com/YegorMy/db-fabricator#readme",
   "dependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
     "bluebird": "^3.5.0",
     "chai": "^3.5.0",
     "mocha": "^3.3.0",
