@@ -135,15 +135,17 @@ class SessionHelper {
     }
 
     for (const element of toUpdate) {
-      if (element.__insert) {
-        delete element.__insert;
+      if (toDelete.indexOf(element.id) === -1) {
+        if (element.__insert) {
+          delete element.__insert;
 
-        promiseQueue.push(this.adapter.create(table, element));
-      } else if (toDelete.indexOf(element.id) === -1) {
-        const elementId = element.id; // save id
-        delete element.id; // we don't want to update id for the element
+          promiseQueue.push(this.adapter.create(table, element));
+        } else {
+          const elementId = element.id; // save id
+          delete element.id; // we don't want to update id for the element
 
-        promiseQueue.push(this.adapter.update(table, element, elementId));
+          promiseQueue.push(this.adapter.update(table, element, elementId));
+        }
       }
     }
 
