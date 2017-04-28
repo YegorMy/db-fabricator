@@ -1,6 +1,8 @@
 const mysqlConnector = require('../connectors/mysql.connector');
 const MySQLHelper = require('../helpers/mysql.helper');
 const Adapter = require('./general.adapter');
+const GeneratedHelper = require('../helpers/mysql-generated.helper');
+const Promise = require('bluebird');
 
 /**
  * @class MySQLAdapter
@@ -15,12 +17,16 @@ class MySQLAdapter extends Adapter {
    * @param {string} mysqlConnectionParameters.user - user to use in connection
    * @param {string} mysqlConnectionParameters.password - password for user
    * @param {string} mysqlConnectionParameters.database - database to connect to
+   * @param {boolean} mysqlConnectionParameters.cacheSchema - cache schema for columns
    */
   constructor (mysqlConnectionParameters) {
     super();
     const connectionPromise = mysqlConnector(mysqlConnectionParameters);
 
     this.connectionPromise = connectionPromise.then(this.setConnection.bind(this));
+    this.database = mysqlConnectionParameters.database;
+    this.cacheSchema = mysqlConnectionParameters.cacheSchema;
+    this.__cache = {};
   }
 
   /**
@@ -89,9 +95,27 @@ class MySQLAdapter extends Adapter {
    * @param {string|string[]} fields - table fields to select
    */
 
-  select (table, fields, constraints) {
+  select (table, fields, constraints, hasGenerated = false) {
     return this.waitForConnect().then(() => {
-      return this.connection.query(MySQLHelper.generateSelectQuery(table, fields, constraints));
+      const promiseQueue = [
+        this.connection.query(MySQLHelper.generateSelectQuery(table, fields, constraints))
+      ];
+
+      if (hasGenerated && !this.__cache[table]) {
+        promiseQueue.push(this.searchForGeneratedColumns(table));
+      } else if (hasGenerated && this.__cache[table]) {
+        promiseQueue.push(Promise.resolve(this.__cache[table]));
+      }
+
+      return Promise.all(promiseQueue);
+    }).then(([data, generatedColumns]) => {
+      if (!generatedColumns) {
+        return data;
+      }
+
+      this.storeGeneratedTablesCache(table, generatedColumns);
+
+      return [data[0], generatedColumns];
     });
   }
 
@@ -118,6 +142,14 @@ class MySQLAdapter extends Adapter {
     return this.waitForConnect().then( () => {
       return this.connection.connection.close();
     });
+  };
+
+  searchForGeneratedColumns (table) {
+    return GeneratedHelper.searchForGeneratedColumns(this.connection, this.database, table);
+  };
+
+  storeGeneratedTablesCache (table, dataToStore) {
+    this.__cache[table] = dataToStore;
   }
 }
 

@@ -1,7 +1,8 @@
 const Adapter = require('./adapters/general.adapter');
 const MySQLAdapter = require('./adapters/mysql.adapter');
+const GeneratedHelper = require('./helpers/mysql-generated.helper');
+const SessionHelper = require('./helpers/session.helper');
 const Promise = require('bluebird');
-const uuid = require('uuid').v4;
 
 /**
  * @class Fabricator
@@ -16,15 +17,13 @@ class Fabricator {
    */
   constructor (adapter) {
     this.adapter = null;
-    this.sessionStared = false;
-    this.sessionData = {};
-    this.sessions = [];
 
     if (!adapter instanceof Adapter) {
       throw new Error('Unsupported Adapter');
     }
 
     this.adapter = adapter;
+    this.sessionManager = new SessionHelper(this.adapter);
   };
 
   /**
@@ -33,8 +32,7 @@ class Fabricator {
    */
 
   startSession () {
-    this.sessionStared = true;
-    this.sessions.unshift(uuid());
+    this.sessionManager.startSession();
   };
 
   /**
@@ -44,138 +42,8 @@ class Fabricator {
    */
 
   stopSession () {
-    const latestSessionKey = this.getLatestSessionKey();
-
-    return this.removeSessionData(latestSessionKey).then(() => {
-      this.removeSession(latestSessionKey);
-
-      return true;
-    });
+    this.sessionManager.stopSession();
   };
-  
-  /**
-   * @function Fabricator.getLatestSessionKey
-   * @description Returns uuid of latest session
-   * @returns {string} - uuid of latest session
-   */
-
-  getLatestSessionKey () {
-    return this.sessions[0];
-  }
-
-  /**
-   * @function Fabricator.saveSessionData
-   * @description Saves data to the latest session. This data will be removed or updated when current session will be closed. Contains only data from updates and creates.
-   * @param {string} table - Table where we modify data
-   * @param {number[]|number|object|object[]} insertedData - data that was created or updated
-   */
-
-  saveSessionData (table, insertedData) {
-    const latestSessionKey = this.getLatestSessionKey();
-    
-    if (!this.sessionStared) {
-      return false;
-    }
-
-    if (!this.sessionData[latestSessionKey]) {
-      this.sessionData[latestSessionKey] = {};
-    }
-
-    if (!this.sessionData[latestSessionKey][table]) {
-      this.sessionData[latestSessionKey][table] = [];
-    }
-
-    if (insertedData instanceof Array) {
-      if (insertedData.length === 1) {
-        this.sessionData[latestSessionKey][table].push(insertedData[0]);
-      } else {
-        for (const data of insertedData) {
-          this.sessionData[latestSessionKey][table].push(data);
-        }
-      }
-    } else {
-      this.sessionData[latestSessionKey][table].push(insertedData);
-    }
-  };
-
-  /**
-   * @function Fabricator.removeSessionData
-   * @description Removes data from session by it's key. Removes all created data and reverting all the modified data.
-   * @param {string} sessionKey - Key of the session to remove data from
-   */
-
-  removeSessionData (sessionKey) {
-    const promiseQueue = [];
-    const sessionData = this.sessionData[sessionKey];
-    if (!sessionData) {
-      return Promise.resolve(true);
-    }
-    const sessionDataKeys = Object.keys(sessionData);
-
-    for (const key of sessionDataKeys) {
-      this.renderSessionData(key, sessionData[key], promiseQueue);
-    }
-
-    return Promise.all(promiseQueue);
-  };
-
-  /**
-   * @function Fabricator.renderSessionData
-   * @description Renders data saved in session. If data[n] is a number, delete this by id. If data[n] is an object, we should restore all values from data[n] by data[n].id
-   * @param {string} table - table to perform queries to
-   * @param {object[]|number[]} value - data that was aved for current session
-   * @param {Promise[]} promiseQueue - promise queue to execute
-   */
-
-  renderSessionData (table, value, promiseQueue) {
-    if (!value.length) {
-      return;
-    }
-    const toDelete = [];
-    const toUpdate = [];
-
-    // if element of the value is simple number, that means we need to delete it.
-    // if element of the value is an object, we need to modify it by id
-
-    for (const element of value) {
-      if (typeof element === 'number' || typeof element === 'string') {
-        toDelete.push(element);
-        continue;
-      }
-
-      toUpdate.push(element);
-    }
-
-    for (const element of toUpdate) {
-      if (toDelete.indexOf(element.id) === -1) {
-        const elementId = element.id; // save id
-        delete element.id; // we don't want to update id for the element
-
-        promiseQueue.push(this.adapter.update(table, element, elementId));
-      }
-    }
-
-    for (const element of toDelete) {
-      promiseQueue.push(this.adapter.remove(table, element));
-    }
-
-    return promiseQueue;
-  }
-
-  /**
-   * @function Fabricator.removeSession
-   * @description Removes session from local session key value storage. 
-   * @param {string} sessionKey 
-   */
-
-  removeSession (sessionKey) {
-    this.sessions.splice(this.sessions.indexOf(sessionKey), 1);
-    delete this.sessionData[sessionKey];
-
-    if (!this.sessions.length) {
-      this.sessionStared = false;
-    }
-  }
 
   /**
    * @function Fabricator.create
@@ -186,7 +54,7 @@ class Fabricator {
 
   create (table, data) {
     return this.adapter.create(table, data).then((insertedData) => {
-      this.saveSessionData(table, insertedData);
+      this.sessionManager.saveSessionData(table, insertedData);
       return insertedData[0];
     });
   };
@@ -195,11 +63,22 @@ class Fabricator {
    * @function Fabricator.remove
    * @description Removes all entities from table that matched passed ID list
    * @param {string} table - table to query against
-   * @param {number[]} data - array of ids to remove from table
+   * @param {number[]|object|string} filter - filter to find rows to delete
    */
 
-  remove (table, data) {
-    return this.adapter.remove(table, data).then(() => true);
+  remove (table, filter, hasGenerated = false) {
+    return this.adapter.select(table, '', filter, hasGenerated).then(data => {
+      if (!data[0].length) {
+        return true;
+      }
+
+      const generatedColumns = data[1];
+      const dataToStoreInSession = GeneratedHelper.createDataToStoreInSession(data[0], generatedColumns);
+
+      this.sessionManager.saveSessionData(table, dataToStoreInSession);
+
+      return this.adapter.remove(table, filter);
+    });
   };
 
   /**
@@ -225,7 +104,7 @@ class Fabricator {
 
       for (const update of initialData) {
 
-        this.saveSessionData(table, update);
+        this.sessionManager.saveSessionData(table, update);
         updateQueue.push(this.adapter.update(table, updateData, idList));
       }
 
@@ -233,13 +112,23 @@ class Fabricator {
     });
   };
 
+  select (table, fields, filter) {
+    if (!filter) {
+      filter = fields;
+      fields = '';
+    }
+    return this.adapter.select(table, fields, filter).then(data => data[0]);
+  }
+
   /**
    * @function Fabricator.closeConnection
-   * @description Closes connection to current database
+   * @description Closes all currently active sessions and closes connection do database
    */
 
   closeConnection () {
-    this.adapter.disconnect();
+    this.sessionManager.stopAllSessions().then(() => {
+      this.adapter.disconnect();
+    });
   }
 };
 

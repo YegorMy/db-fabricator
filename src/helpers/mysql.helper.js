@@ -17,12 +17,12 @@ const MySQLHelper = {
    * @function MySQLHelper.generateDeleteQuery
    * @description Generates SQL DELETE query
    * @param {string} table - table to select from
-   * @param {string|string[]} fields - ids to delete
+   * @param {number[]|number|object} constraints - ids to delete
    * @return {string} - DELETE query
    */
 
-  generateDeleteQuery (table, data) {
-    return `DELETE FROM \`${table}\` where \`id\`${MysqlConstraintsHelper.generateIds(data)}`;
+  generateDeleteQuery (table, constraints) {
+    return `DELETE FROM \`${table}\`${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`;
   },
   
   /**
@@ -34,8 +34,9 @@ const MySQLHelper = {
    */
 
   generateSelectQuery (table, fields, constraints) {
-    return `SELECT ${this.generateSelectFields(fields)} FROM \`${table}\`${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`;
+    return `SELECT ${this.generateSelectFields(fields)} FROM ${this.renderTableName(table)}${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`;
   },
+  
 
   /**
    * @function MySQLHelper.generateUpdateQuery
@@ -103,6 +104,14 @@ const MySQLHelper = {
     }
     
     return data.map(el => `\`${el}\``).join(',');
+  },
+
+  renderTableName (tableName) {
+    if (tableName.indexOf('`') === -1) {
+      return `\`${tableName}\``;
+    }
+
+    return tableName;
   }
 };
 

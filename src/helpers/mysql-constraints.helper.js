@@ -14,9 +14,25 @@ const MysqlConstraintsHelper = {
       return '';
     }
 
+    // constraints can be either a string " WHERE `id` = 1"
+
     if (typeof constraints === 'string') {
       return ` ${constraints}`;
     }
+
+    // or a single digit
+
+    if (typeof constraints === 'number') {
+      return ` WHERE \`id\` = ${constraints}`;
+    }
+
+    // or an array of ids [1,2,3,4]
+
+    if (constraints instanceof Array) {
+      return ` WHERE \`id\`${this.generateIds(constraints)}`;
+    }
+
+    // or a filter
 
     return ` WHERE ${this.convertObjectToConstraints(constraints)}`;
   },
@@ -88,7 +104,7 @@ const MysqlConstraintsHelper = {
     }
 
     if (data.$in) {
-      return this.generateIds(data.$in.map(e => this.formatElement(e)));
+      return this.generateIds(data.$in);
     }
 
     throw new Error(`Unrecognized pattern ${JSON.stringify(data)}`);
@@ -109,11 +125,11 @@ const MysqlConstraintsHelper = {
       if (data.length === 1) {
         currentData = data[0];
       } else {
-        return ` IN (${data.join(',')})`;
+        return ` IN (${data.map(e => this.formatElement(e)).join(',')})`;
       }
     }
 
-    return ` = ${currentData}`;
+    return ` = ${this.formatElement(currentData)}`;
   },
 
   /**

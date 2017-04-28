@@ -35,6 +35,10 @@ describe('Tests for MySQL Adapter select query generation', () => {
   });
 
   describe('generateSelectQuery with constraints', () => {
+    it('should generate correct query for array of ids', () => {
+      assert.equal(MySQLHelper.generateSelectQuery('TestTable', '', [1,2]), 'SELECT * FROM `TestTable` WHERE `id` IN (1,2)');
+    });
+
     it('should generate correct query for simple constraints', () => {
       assert.equal(MySQLHelper.generateSelectQuery('TestTable', '', {
         id: 1,

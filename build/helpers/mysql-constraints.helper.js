@@ -16,9 +16,25 @@ var MysqlConstraintsHelper = {
       return '';
     }
 
+    // constraints can be either a string " WHERE `id` = 1"
+
     if (typeof constraints === 'string') {
       return ' ' + constraints;
     }
+
+    // or a single digit
+
+    if (typeof constraints === 'number') {
+      return ' WHERE `id` = ' + constraints;
+    }
+
+    // or an array of ids [1,2,3,4]
+
+    if (constraints instanceof Array) {
+      return ' WHERE `id`' + this.generateIds(constraints);
+    }
+
+    // or a filter
 
     return ' WHERE ' + this.convertObjectToConstraints(constraints);
   },
@@ -86,8 +102,6 @@ var MysqlConstraintsHelper = {
    */
 
   convertToRightPartOfConstraint: function convertToRightPartOfConstraint(data) {
-    var _this = this;
-
     if (typeof data === 'string' || typeof data === 'number') {
       return ' = ' + this.formatElement(data);
     }
@@ -117,9 +131,7 @@ var MysqlConstraintsHelper = {
     }
 
     if (data.$in) {
-      return this.generateIds(data.$in.map(function (e) {
-        return _this.formatElement(e);
-      }));
+      return this.generateIds(data.$in);
     }
 
     throw new Error('Unrecognized pattern ' + JSON.stringify(data));
@@ -134,6 +146,8 @@ var MysqlConstraintsHelper = {
    */
 
   generateIds: function generateIds(data) {
+    var _this = this;
+
     var isArray = false;
     var currentData = data;
 
@@ -141,11 +155,13 @@ var MysqlConstraintsHelper = {
       if (data.length === 1) {
         currentData = data[0];
       } else {
-        return ' IN (' + data.join(',') + ')';
+        return ' IN (' + data.map(function (e) {
+          return _this.formatElement(e);
+        }).join(',') + ')';
       }
     }
 
-    return ' = ' + currentData;
+    return ' = ' + this.formatElement(currentData);
   },
 
 
