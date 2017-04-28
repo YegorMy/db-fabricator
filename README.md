@@ -5,17 +5,17 @@
 `yarn add db-fabricate`
 
 ## Structure
-- [What is it?](#what-is-it)
-- [Simple Example](#example)
-- [Documentation](#docs)
-- - [Create](#create)
-- - [Start Session](#start-session)
-- - [Stop Session](#stop-session)
-- - [Update](#update)
-- - [Select](#select)
-- - [Remove](#remove)
-- - [Close Connection](#close-connection)
-- - [Constraints](#constraints)
+- [What is it?](#-whats-it)
+- [Simple Example](#-simple-example)
+- [Documentation](#-documentation-for-methods)
+- - [Create](#-fabricatorcreate)
+- - [Start Session](#-fabricatorstartsession)
+- - [Stop Session](#-fabricatorstopsession)
+- - [Update](#-fabricatorupdatetable-data-constraints)
+- - [Select](#-fabricatorselecttable-filter)
+- - [Remove](#-fabricatorremovetable-data)
+- - [Close Connection](#-fabricatorcloseconnection)
+- - [Constraints](#-constraints-for-fabricatorupdate)
 
 ## <a name="what-is-it"></a> What's it?
 `db-fabricator` is a simple node.js module that can create, update and delete data and also manipulate created and updated data during sessions.
@@ -133,7 +133,7 @@ Fabricator.select('TestTable', {
 });
 ```
 
-## <a name="#remove"></a> Fabricator.remove(table, data)
+## Fabricator.remove(table, data)
 
 Removes data from `table` by passed list of ids (or single id):
 
