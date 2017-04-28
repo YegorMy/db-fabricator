@@ -51,9 +51,9 @@ Fabricator.create('TestTable', {
 
 So you can easily create integration tests with on-the-go data and simply remove it after creation.
 
-# <a href="#docs"></a> Documentation for methods:
+# <a name="#docs"></a> Documentation for methods:
 
-## <a href="#create"></a> Fabricator.create()
+## <a name="#create"></a> Fabricator.create()
 
 Will create new entity in database with passed parameters:
 
@@ -65,7 +65,7 @@ Fabricator.create('TestTable', { // will be written into Session 2
 });
 ```
 
-## <a href="#start-session"></a> Fabricator.startSession()
+## <a name="#start-session"></a> Fabricator.startSession()
 
 Starts new session for fabricator. You can nest sessions. Data will be recoreded to the latest opened session.
 On close session all data created or modified in this session will be restored.
@@ -92,7 +92,7 @@ Fabricator.create('TestTable', { // will be written into Session 2
 ```
 
 
-## <a href="#stop-session"></a> Fabricator.stopSession()
+## <a name="#stop-session"></a> Fabricator.stopSession()
 
 Stops latest opened session.
 On close session all data created or modified in this session will be restored.
@@ -104,7 +104,7 @@ Fabricator.closeSession().then(() => {
 });
 ```
 
-## <a href="#update"></a> Fabricator.update(table, data, constraints)
+## <a name="#update"></a> Fabricator.update(table, data, constraints)
 
 Updates entity/enitities in `table` with fields and values specified in `data`. Entities will be found by passed constraints.
 
@@ -119,7 +119,7 @@ Fabricator.update('TestTable', {name: '123'}, {id: 1}).then(() => {
 });
 ```
 
-## <a href="#select"></a> Fabricator.select(table, filter)
+## <a name="#select"></a> Fabricator.select(table, filter)
 
 Selects data by given [constraints](#constraints)
 
@@ -133,7 +133,7 @@ Fabricator.select('TestTable', {
 });
 ```
 
-## <a href="#remove"></a> Fabricator.remove(table, data)
+## <a name="#remove"></a> Fabricator.remove(table, data)
 
 Removes data from `table` by passed list of ids (or single id):
 
@@ -168,7 +168,7 @@ Fabricator.select('TestTable', [1]).then(data => {
 })
 ```
 
-## <a href="#close-connection"></a> Fabricator.closeConnection()
+## <a name="#close-connection"></a> Fabricator.closeConnection()
 
 Stops all active sessions and closes connection to current database.
 
