@@ -58,7 +58,7 @@ So you can easily create integration tests with on-the-go data and simply remove
 Will create new entity in database with passed parameters:
 
 ```javascript
-Fabricator.create('TestTable', { // will be written into Session 2
+Fabricator.create('TestTable', {
   name: '123'
 }).then((id) => {
   console.log(id); // id of created entity
@@ -99,7 +99,7 @@ On close session all data created or modified in this session will be restored.
 
 ```javascript
 Fabricator.startSession();
-Fabricator.closeSession().then(() => {
+Fabricator.stopSession().then(() => {
   console.log('session closed');
 });
 ```
@@ -113,7 +113,7 @@ Fabricator.startSession();
 Fabricator.update('TestTable', {name: '123'}, {id: 1}).then(() => {
   // do some tests...
 
-  return Fabricator.closeSession();
+  return Fabricator.stopSession();
 }).then(() => {
   console.log('session closed');
 });
