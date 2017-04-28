@@ -21,14 +21,6 @@ describe('Tests for MySQL Adapter insert query generation', () => {
       }), '(value1, value2) VALUES(\'test1\', \'test2\')');
     });
 
-    it('should generate correct insert query for date', () => {
-      const date = new Date();
-      
-      assert.equal(MySQLHelper.generateValues({
-        value1: date,
-      }), `(value1) VALUES(\'${date.toString()}\')`);
-    });
-
     it('should generate correct insert query for array', () => {
       assert.equal(MySQLHelper.generateValues({
         value1: [1, 2, 3],
@@ -79,14 +71,6 @@ describe('Tests for MySQL Adapter insert query generation', () => {
       assert.equal(MySQLHelper.generateInsertQuery('TestTable', {
         value1: [1, 'test value', [2, 'test value2']],
       }), 'INSERT INTO `TestTable` (value1) VALUES(\'[1,"test value",[2,"test value2"]]\')');
-    });
-
-    it('should generate correct insert query for date', () => {
-      const date = new Date();
-
-      assert.equal(MySQLHelper.generateInsertQuery('TestTable', {
-        value1: date,
-      }), `INSERT INTO \`TestTable\` (value1) VALUES('${date.toString()}')`);
     });
 
     it('should generate correct insert query for object', () => {

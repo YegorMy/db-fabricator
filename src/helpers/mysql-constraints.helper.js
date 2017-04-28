@@ -160,7 +160,7 @@ const MysqlConstraintsHelper = {
       return `'${element}'`;
     }
     if (element instanceof Date) {
-      return `'${element.toString()}'`;
+      return `'${this.formatDate(element)}'`;
     }
     if (element instanceof Object) {
       return `'${JSON.stringify(element)}'`;
@@ -168,6 +168,10 @@ const MysqlConstraintsHelper = {
 
     return element;
   },
+
+  formatDate (date) {
+    return date.toISOString().slice(0, 23);
+  }
 };
 
 module.exports = MysqlConstraintsHelper;

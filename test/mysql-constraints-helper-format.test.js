@@ -12,8 +12,17 @@ describe('format element', () => {
 
   it('should correctly format a date', () => {
     const date = new Date();
+    date.setFullYear(2017);
+    date.setMonth(3);
+    date.setDate(28);
+    date.setHours(16);
+    date.setMinutes(3);
+    date.setSeconds(24);
+    date.setMilliseconds(409);
 
-    assert.equal(MySQLConstraintsHelper.formatElement(date), `'${date.toString()}'`);
+    // 2017-04-28T13:03:24.409
+
+    assert.equal(MySQLConstraintsHelper.formatElement(date), '\'2017-04-28T13:03:24.409\'');
   });
 
   it('should correctly format an array of numbers', () => {
