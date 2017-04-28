@@ -125,12 +125,36 @@ Fabricator.update('TestTable', {name: '123'}, {id: 1}).then(() => {
 ## Fabricator.delete(table, data)
 
 Removes data from `table` by passed list of ids (or single id):
-*NOTE:* Removed data wont be restored on session close. _To be implemented_
 
 ```javascript
-Fabricator.remove('TestTable', [1]).then(() => {
-  // do some tests...
+
+return Fabricator.remove('TestTable', [1], true).then(() => {
+  // do some tests
 });
+```
+
+*NOTE:* Remove also works with sessions. _Added at *1.0.5*_
+
+```javascript
+Fabricator.startSession();
+
+Fabricator.select('TestTable', [1]).then(data => {
+  console.log(data); // if data exists returns data
+
+  return Fabricator.remove('TestTable', [1], true);
+}).then(data => {
+  return Fabricator.select('TestTable', [1])
+}).then(data => {
+  console.log(data); // no data
+
+  return Fabricator.stopSession();
+}).then(() => {
+  return Fabricator.select('TestTable', [1])
+}).then(data => {
+  console.log(data); // revert to previous state
+
+  return Fabricator.closeConnection();
+})
 ```
 
 ## Fabricator.closeConnection()
