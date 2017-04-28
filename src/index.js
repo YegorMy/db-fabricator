@@ -130,6 +130,16 @@ class Fabricator {
       this.adapter.disconnect();
     });
   }
+
+  createTemplate (table, data) {
+    return (dataToUpdate = {}) => {
+      for (const key in dataToUpdate) {
+        data[key] = dataToUpdate[key];
+      }
+
+      return this.create(table, data);
+    }
+  }
 };
 
 module.exports.Fabricator = Fabricator;
