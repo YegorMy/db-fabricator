@@ -122,7 +122,21 @@ Fabricator.update('TestTable', {name: '123'}, {id: 1}).then(() => {
 });
 ```
 
-## Fabricator.delete(table, data)
+## Fabricator.select(table, filter)
+
+Selects data by given [constraints](#constraints)
+
+```javascript
+Fabricator.select('TestTable', {
+  id: {
+    $gte: 10
+  }
+}).then(data => {
+  // do some tests
+});
+```
+
+## Fabricator.remove(table, data)
 
 Removes data from `table` by passed list of ids (or single id):
 
@@ -181,7 +195,7 @@ List of avaliable filters:
 - `$and` - can be nested. {$and: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 AND `name` = '123')``
 - `$or` - can be nexted. {$or: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 OR `name` = '123')``
 
-## Constraints nesting
+## <a name="constraints"></a>Constraints nesting
 
 ```javascript
 {
