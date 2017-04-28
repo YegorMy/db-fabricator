@@ -39,7 +39,23 @@ describe('Tests for MySQL Adapter constraints generation', () => {
   });
 
   it('should generate correct constraint for json string', () => {
-    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({$json: 'address.name'}), '->\'$.address.name\'');
+    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({
+      $json: {
+        key: 'address.name',
+        value: 'Pkway st'
+      }
+    }), '->\'$.address.name\' = \'Pkway st\'');
+  });
+
+  it('should generate correct constraint for json string nested', () => {
+    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({
+      $json: {
+        key: 'address.name',
+        value: {
+          $ne: 'Pkway st'
+        }
+      }
+    }), '->\'$.address.name\' <> \'Pkway st\'');
   });
 
   it('should generate correct constraint for exists positive', () => {

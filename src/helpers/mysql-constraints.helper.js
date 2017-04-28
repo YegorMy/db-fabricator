@@ -72,9 +72,14 @@ const MysqlConstraintsHelper = {
    * @function MysqlConstraintsHelper.convertToRightPartOfConstraint
    * @description Converts loopback-like element of the constraint to MySQL one. Example: {$like: '1'} -> " LIKE '1'"
    * @param {object|string} data - one simple loopback-like element of the constraint.
+   * @param {boolean} noNested - if $or, $and or $json appears when noNested is true throw an Error
    */
 
-  convertToRightPartOfConstraint (data) {
+  convertToRightPartOfConstraint (data, noNested = false) {
+    if (noNested && (data.$json || data.$or || data.$and)) {
+      throw new Error('$json can not nest $or, $and or $json');
+    }
+
     if (typeof data === 'string' || typeof data === 'number') {
       return ` = ${this.formatElement(data)}`;
     }
@@ -108,7 +113,7 @@ const MysqlConstraintsHelper = {
     }
 
     if (data.$json) {
-      return `->'$.${data.$json}'`
+      return `->'$.${data.$json.key}'${this.convertToRightPartOfConstraint(data.$json.value, true)}`
     }
 
     if (data.$exists === true) {
