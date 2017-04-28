@@ -177,6 +177,50 @@ Fabricator.closeConnection();
 console.log('connection closed');
 ```
 
+## Fabricator.createTemplate(table, data)
+
+Simple template that returns a function that can be called with some particular data and it will be written to database.
+
+```javascript
+const template = Fabricator.createTemplate('TestTable', {
+  value1: 'test',
+  value2: 'test2',
+  value3: 'test3'
+});
+
+Fabricator.startSession();
+
+template({value1: 'replaced value'}).then(id => {
+  // {value1: 'replaced value', value2: 'test2', value3: 'test3'} will be stored in session and in database
+  
+  return Fabricator.closeConnection(); // created data will be removed
+});
+
+```
+
+_TO IMPLEMENT:_ Allow templates use another templates and store related IDs.
+
+**NOT IMPLEMENTED YET**
+```
+const organizationTemplate = Fabricator.createTemplate('TestTable', {
+  name: 'Horns and Hooves LTD'
+});
+
+const userTemplate = Fabricator.createTemplate('TestTable', {
+  firstName: 'John',
+  lastName: 'Smith',
+  organizationId: () => organizationTemplate()
+});
+
+Fabricator.startSession();
+
+userTemplate({lastName: 'Lee'}).then(id => {
+  // organization will be created in database an it's id will be inserted into organizationId of the user
+  
+  Fabricator.closeConnection(); // both organization and user will be removed from database
+});
+```
+
 # <a name="constraints"></a> Constraints for `Fabricator.update`
 
 You can create loopback-like constraints or your own by simply passing an SQL WHERE string.
