@@ -37,6 +37,18 @@ describe('Tests for MySQL Adapter constraints generation', () => {
   it('should generate correct constraint for ne string', () => {
     assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({$ne: '1'}), ' <> \'1\'');
   });
+
+  it('should generate correct constraint for json string', () => {
+    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({$json: 'address.name'}), '->\'$.address.name\'');
+  });
+
+  it('should generate correct constraint for exists positive', () => {
+    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({$exists: true}), ' is not null');
+  });
+
+  it('should generate correct constraint for exists negative', () => {
+    assert.equal(MysqlConstraintsHelper.convertToRightPartOfConstraint({$exists: false}), ' is null');
+  });
 });
 
 // convertToRightPartOfConstraint

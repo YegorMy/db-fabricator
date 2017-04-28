@@ -107,6 +107,18 @@ const MysqlConstraintsHelper = {
       return this.generateIds(data.$in);
     }
 
+    if (data.$json) {
+      return `->'$.${data.$json}'`
+    }
+
+    if (data.$exists === true) {
+      return ' is not null';
+    }
+
+    if (data.$exists === false) {
+      return ' is null';
+    }
+
     throw new Error(`Unrecognized pattern ${JSON.stringify(data)}`);
   },
 
