@@ -15,6 +15,7 @@
 - - [Select](#-fabricatorselecttable-filter)
 - - [Remove](#-fabricatorremovetable-data)
 - - [Close Connection](#-fabricatorcloseconnection)
+- - [Templates](#fabricatorcreatetemplatetable-data)
 - - [Constraints](#-constraints-for-fabricatorupdate)
 
 ## <a name="what-is-it"></a> What's it?
