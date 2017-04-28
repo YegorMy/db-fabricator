@@ -189,8 +189,10 @@ List of avaliable filters:
 - `$ne` - {id: {$gt: 1}} converts to `` `id` <> 1``
 - `$like` - {id: {$like: `%12%5`}} converts to `` `id` like '%12%5'``
 - `$in` - {id: {$in: [1,2,3,4,5]}} converts to `` `id` IN (1,2,3,4,5)``. {id: {$in:[1]}} coverts to `` `id` = 1``
+- `$json` - {address: {$json: {key: 'address.city', value: 'Pkway st'}}} converts to `` `address`->'$.address.city' = 'Pkway st'``. Can use all filters except $or, $and or $json.
+- `$exists` - {name: {$exists: true}} converts to `` `name` is not null``. {name: {$exists: false}} converts to `` `name` is null``
 - `$and` - can be nested. {$and: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 AND `name` = '123')``
-- `$or` - can be nexted. {$or: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 OR `name` = '123')``
+- `$or` - can be nested. {$or: [{id: 1}, {name: '123'}]} converts to ``(`id` = 1 OR `name` = '123')``
 
 ## Constraints nesting
 
