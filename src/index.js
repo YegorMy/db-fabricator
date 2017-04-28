@@ -42,7 +42,7 @@ class Fabricator {
    */
 
   stopSession () {
-    this.sessionManager.stopSession();
+    return this.sessionManager.stopSession();
   };
 
   /**
@@ -126,7 +126,7 @@ class Fabricator {
    */
 
   closeConnection () {
-    this.sessionManager.stopAllSessions().then(() => {
+    return this.sessionManager.stopAllSessions().then(() => {
       this.adapter.disconnect();
     });
   }
