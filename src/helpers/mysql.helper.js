@@ -1,4 +1,4 @@
-const MysqlConstraintsHelper = require('./mysql-constraints.helper.js');
+const MysqlConstraintsHelper = require('./mysql-constraints.helper.js')
 
 const MySQLHelper = {
   /**
@@ -22,9 +22,9 @@ const MySQLHelper = {
    */
 
   generateDeleteQuery (table, constraints) {
-    return `DELETE FROM \`${table}\`${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`;
+    return `DELETE FROM \`${table}\`${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`
   },
-  
+
   /**
    * @function MySQLHelper.generateSelectQuery
    * @description Generates SQL SELECT query
@@ -34,9 +34,8 @@ const MySQLHelper = {
    */
 
   generateSelectQuery (table, fields, constraints) {
-    return `SELECT ${this.generateSelectFields(fields)} FROM ${this.renderTableName(table)}${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`;
+    return `SELECT ${this.generateSelectFields(fields)} FROM ${this.renderTableName(table)}${MysqlConstraintsHelper.generateSelectConstraints(constraints)}`
   },
-  
 
   /**
    * @function MySQLHelper.generateUpdateQuery
@@ -47,15 +46,15 @@ const MySQLHelper = {
    */
 
   generateUpdateQuery (table, data, constraints) {
-    let query = `UPDATE \`${table}\` SET ${this.generateUpdateFields(data)}`;
+    let query = `UPDATE \`${table}\` SET ${this.generateUpdateFields(data)}`
 
     if (constraints) {
-      query += ` WHERE \`id\`${MysqlConstraintsHelper.generateIds(constraints)}`;
+      query += ` WHERE \`id\`${MysqlConstraintsHelper.generateIds(constraints)}`
     }
-    
-    return query;
+
+    return query
   },
-  
+
   /**
    * @function MySQLHelper.generateValues
    * @description Transforms key:value pair into mysql INSERT part of the query. Example {key: 'value'} -> (key) VALUES("value")
@@ -63,16 +62,16 @@ const MySQLHelper = {
    */
 
   generateValues (data) {
-    const keys = Object.keys(data);
-    const values = [];
-    let resultQuery = `(${keys.join(', ')})`;
+    const keys = Object.keys(data)
+    const values = []
+    let resultQuery = `(${keys.join(', ')})`
 
     for (const key of keys) {
-      const element = data[key];
-      values.push(MysqlConstraintsHelper.formatElement(element));
+      const element = data[key]
+      values.push(MysqlConstraintsHelper.formatElement(element))
     }
 
-    return `${resultQuery} VALUES(${values.join(', ')})`;
+    return `${resultQuery} VALUES(${values.join(', ')})`
   },
 
   /**
@@ -82,14 +81,14 @@ const MySQLHelper = {
    */
 
   generateUpdateFields (data) {
-    const keys = Object.keys(data);
-    const values = [];
+    const keys = Object.keys(data)
+    const values = []
 
     for (const key of keys) {
-      values.push(`\`${key}\` = ${MysqlConstraintsHelper.formatElement(data[key])}`);
+      values.push(`\`${key}\` = ${MysqlConstraintsHelper.formatElement(data[key])}`)
     }
 
-    return values.join(', ');
+    return values.join(', ')
   },
 
   /**
@@ -100,19 +99,19 @@ const MySQLHelper = {
 
   generateSelectFields (data) {
     if (!data) {
-      return '*';
+      return '*'
     }
-    
-    return data.map(el => `\`${el}\``).join(',');
+
+    return data.map(el => `\`${el}\``).join(',')
   },
 
   renderTableName (tableName) {
     if (tableName.indexOf('`') === -1) {
-      return `\`${tableName}\``;
+      return `\`${tableName}\``
     }
 
-    return tableName;
+    return tableName
   }
-};
+}
 
-module.exports = MySQLHelper;
+module.exports = MySQLHelper

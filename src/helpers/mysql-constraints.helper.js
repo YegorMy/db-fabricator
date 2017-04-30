@@ -11,30 +11,30 @@ const MysqlConstraintsHelper = {
    */
   generateSelectConstraints (constraints) {
     if (!constraints) {
-      return '';
+      return ''
     }
 
     // constraints can be either a string " WHERE `id` = 1"
 
     if (typeof constraints === 'string') {
-      return ` ${constraints}`;
+      return ` ${constraints}`
     }
 
     // or a single digit
 
     if (typeof constraints === 'number') {
-      return ` WHERE \`id\` = ${constraints}`;
+      return ` WHERE \`id\` = ${constraints}`
     }
 
     // or an array of ids [1,2,3,4]
 
     if (constraints instanceof Array) {
-      return ` WHERE \`id\`${this.generateIds(constraints)}`;
+      return ` WHERE \`id\`${this.generateIds(constraints)}`
     }
 
     // or a filter
 
-    return ` WHERE ${this.convertObjectToConstraints(constraints)}`;
+    return ` WHERE ${this.convertObjectToConstraints(constraints)}`
   },
 
   /**
@@ -45,27 +45,27 @@ const MysqlConstraintsHelper = {
    */
 
   convertObjectToConstraints (constraints, toJOIN = 'AND') {
-    let selectConstraints = [];
+    let selectConstraints = []
 
     if (constraints instanceof Array) {
       for (const value of constraints) {
-        selectConstraints.push(`(${this.convertObjectToConstraints(value, 'AND')})`);
+        selectConstraints.push(`(${this.convertObjectToConstraints(value, 'AND')})`)
       }
     } else {
       for (const key in constraints) {
         if (key === '$query') {
-          selectConstraints.push(constraints[key]);
+          selectConstraints.push(constraints[key])
         } else if (key === '$and') {
-          selectConstraints.push(`(${this.convertObjectToConstraints(constraints.$and, 'AND')})`);
+          selectConstraints.push(`(${this.convertObjectToConstraints(constraints.$and, 'AND')})`)
         } else if (key === '$or') {
-          selectConstraints.push(`(${this.convertObjectToConstraints(constraints.$or, 'OR')})`);
+          selectConstraints.push(`(${this.convertObjectToConstraints(constraints.$or, 'OR')})`)
         } else {
-          selectConstraints.push(`\`${key}\`${this.convertToRightPartOfConstraint(constraints[key])}`);
+          selectConstraints.push(`\`${key}\`${this.convertToRightPartOfConstraint(constraints[key])}`)
         }
       }
     }
-    
-    return selectConstraints.join(` ${toJOIN} `);
+
+    return selectConstraints.join(` ${toJOIN} `)
   },
 
   /**
@@ -77,15 +77,15 @@ const MysqlConstraintsHelper = {
 
   convertToRightPartOfConstraint (data, noNested = false) {
     if (noNested && (data.$json || data.$or || data.$and)) {
-      throw new Error('$json can not nest $or, $and or $json');
+      throw new Error('$json can not nest $or, $and or $json')
     }
 
     if (typeof data === 'string' || typeof data === 'number') {
-      return ` = ${this.formatElement(data)}`;
+      return ` = ${this.formatElement(data)}`
     }
 
     if (data.$like) {
-      return ` like '${data.$like}'`;
+      return ` like '${data.$like}'`
     }
 
     if (data.$gt) {
@@ -93,23 +93,23 @@ const MysqlConstraintsHelper = {
     }
 
     if (data.$lt) {
-      return ` < ${data.$lt}`;
+      return ` < ${data.$lt}`
     }
 
     if (data.$gte) {
-      return ` >= ${data.$gte}`;
+      return ` >= ${data.$gte}`
     }
 
     if (data.$lte) {
-      return ` <= ${data.$lte}`;
+      return ` <= ${data.$lte}`
     }
 
     if (data.$ne) {
-      return ` <> ${this.formatElement(data.$ne)}`;
+      return ` <> ${this.formatElement(data.$ne)}`
     }
 
     if (data.$in) {
-      return this.generateIds(data.$in);
+      return this.generateIds(data.$in)
     }
 
     if (data.$json) {
@@ -117,14 +117,14 @@ const MysqlConstraintsHelper = {
     }
 
     if (data.$exists === true) {
-      return ' is not null';
+      return ' is not null'
     }
 
     if (data.$exists === false) {
-      return ' is null';
+      return ' is null'
     }
 
-    throw new Error(`Unrecognized pattern ${JSON.stringify(data)}`);
+    throw new Error(`Unrecognized pattern ${JSON.stringify(data)}`)
   },
 
   /**
@@ -135,18 +135,17 @@ const MysqlConstraintsHelper = {
    */
 
   generateIds (data) {
-    let isArray = false;
-    let currentData = data;
+    let currentData = data
 
     if (data instanceof Array) {
       if (data.length === 1) {
-        currentData = data[0];
+        currentData = data[0]
       } else {
-        return ` IN (${data.map(e => this.formatElement(e)).join(',')})`;
+        return ` IN (${data.map(e => this.formatElement(e)).join(',')})`
       }
     }
 
-    return ` = ${this.formatElement(currentData)}`;
+    return ` = ${this.formatElement(currentData)}`
   },
 
   /**
@@ -157,21 +156,21 @@ const MysqlConstraintsHelper = {
 
   formatElement (element) {
     if (typeof element === 'string') {
-      return `'${element}'`;
+      return `'${element}'`
     }
     if (element instanceof Date) {
-      return `'${this.formatDate(element)}'`;
+      return `'${this.formatDate(element)}'`
     }
     if (element instanceof Object) {
-      return `'${JSON.stringify(element)}'`;
+      return `'${JSON.stringify(element)}'`
     }
 
-    return element;
+    return element
   },
 
   formatDate (date) {
-    return date.toISOString().slice(0, 23);
+    return date.toISOString().slice(0, 23)
   }
-};
+}
 
-module.exports = MysqlConstraintsHelper;
+module.exports = MysqlConstraintsHelper

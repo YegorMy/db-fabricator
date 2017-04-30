@@ -1,8 +1,8 @@
-const Adapter = require('./adapters/general.adapter');
-const MySQLAdapter = require('./adapters/mysql.adapter');
-const GeneratedHelper = require('./helpers/mysql-generated.helper');
-const SessionHelper = require('./helpers/session.helper');
-const BBPromise = require('bluebird');
+const Adapter = require('./adapters/general.adapter')
+const MySQLAdapter = require('./adapters/mysql.adapter')
+const GeneratedHelper = require('./helpers/mysql-generated.helper')
+const SessionHelper = require('./helpers/session.helper')
+const BBPromise = require('bluebird')
 
 /**
  * @class Fabricator
@@ -12,18 +12,18 @@ const BBPromise = require('bluebird');
 class Fabricator {
   /**
    * @constructor
-   * @description Gets and adapter and sets up it as property of the class. 
+   * @description Gets and adapter and sets up it as property of the class.
    * @param {Adapter} adapter - Adapter to connect the database
    */
   constructor (adapter) {
-    this.adapter = null;
+    this.adapter = null
 
-    if (!adapter instanceof Adapter) {
-      throw new Error('Unsupported Adapter');
+    if (!(adapter instanceof Adapter)) {
+      throw new Error('Unsupported Adapter')
     }
 
-    this.adapter = adapter;
-    this.sessionManager = new SessionHelper(this.adapter);
+    this.adapter = adapter
+    this.sessionManager = new SessionHelper(this.adapter)
   };
 
   /**
@@ -32,7 +32,7 @@ class Fabricator {
    */
 
   startSession () {
-    this.sessionManager.startSession();
+    this.sessionManager.startSession()
   };
 
   /**
@@ -42,7 +42,7 @@ class Fabricator {
    */
 
   stopSession () {
-    return this.sessionManager.stopSession();
+    return this.sessionManager.stopSession()
   };
 
   /**
@@ -54,9 +54,9 @@ class Fabricator {
 
   create (table, data) {
     return this.adapter.create(table, data).then((insertedData) => {
-      this.sessionManager.saveSessionData(table, insertedData);
-      return insertedData[0];
-    });
+      this.sessionManager.saveSessionData(table, insertedData)
+      return insertedData[0]
+    })
   };
 
   /**
@@ -69,16 +69,16 @@ class Fabricator {
   remove (table, filter, hasGenerated = false) {
     return this.adapter.select(table, '', filter, hasGenerated).then(data => {
       if (!data[0].length) {
-        return true;
+        return true
       }
 
-      const generatedColumns = data[1];
-      const dataToStoreInSession = GeneratedHelper.createDataToStoreInSession(data[0], generatedColumns);
+      const generatedColumns = data[1]
+      const dataToStoreInSession = GeneratedHelper.createDataToStoreInSession(data[0], generatedColumns)
 
-      this.sessionManager.saveSessionData(table, dataToStoreInSession);
+      this.sessionManager.saveSessionData(table, dataToStoreInSession)
 
-      return this.adapter.remove(table, filter);
-    });
+      return this.adapter.remove(table, filter)
+    })
   };
 
   /**
@@ -90,34 +90,32 @@ class Fabricator {
    */
 
   update (table, updateData, constraints) {
-    const promiseQueue = [];
-    const fields = Object.keys(updateData);
+    const fields = Object.keys(updateData)
 
     if (fields.indexOf('id') === -1) {
-      fields.unshift('id');
+      fields.unshift('id')
     }
 
     return this.adapter.select(table, fields, constraints).then(data => {
-      const initialData = data[0];
-      const updateQueue = [];
-      const idList = initialData.map(e => e.id);
+      const initialData = data[0]
+      const updateQueue = []
+      const idList = initialData.map(e => e.id)
 
       for (const update of initialData) {
-
-        this.sessionManager.saveSessionData(table, update);
-        updateQueue.push(this.adapter.update(table, updateData, idList));
+        this.sessionManager.saveSessionData(table, update)
+        updateQueue.push(this.adapter.update(table, updateData, idList))
       }
 
-      return BBPromise.all(updateQueue);
-    });
+      return BBPromise.all(updateQueue)
+    })
   };
 
   select (table, fields, filter) {
     if (!filter) {
-      filter = fields;
-      fields = '';
+      filter = fields
+      fields = ''
     }
-    return this.adapter.select(table, fields, filter).then(data => data[0]);
+    return this.adapter.select(table, fields, filter).then(data => data[0])
   }
 
   /**
@@ -127,57 +125,57 @@ class Fabricator {
 
   closeConnection () {
     return this.sessionManager.stopAllSessions().then(() => {
-      this.adapter.disconnect();
-    });
+      this.adapter.disconnect()
+    })
   }
 
   createTemplate (table, data) {
     return (dataToUpdate = {}) => {
-      const pureData = {};
-      const executableData = {};
-      const promiseData = [];
-      const promiseQueue = [];
+      const pureData = {}
+      const executableData = {}
+      const promiseData = []
+      const promiseQueue = []
 
       for (const key in dataToUpdate) {
-        data[key] = dataToUpdate[key];
+        data[key] = dataToUpdate[key]
       }
 
       for (const key in data) {
-        const value = data[key];
+        const value = data[key]
 
         if (typeof value === 'function') {
-          executableData[key] = value;
+          executableData[key] = value
         } else {
-          pureData[key] = value;
+          pureData[key] = value
         }
       }
 
       for (const key in executableData) {
-        const result = executableData[key].apply(null, [pureData]);
+        const result = executableData[key].apply(null, [pureData])
 
         if (result instanceof Promise || result instanceof BBPromise) {
-          promiseData.push(key);
-          promiseQueue.push(result);
+          promiseData.push(key)
+          promiseQueue.push(result)
 
-          continue;
+          continue
         }
 
-        data[key] = result;
+        data[key] = result
       }
 
       return BBPromise.all(promiseQueue).then(result => {
         for (const index in result) {
-          const dataKey = promiseData[index];
-          const dataFromPromise = result[index];
+          const dataKey = promiseData[index]
+          const dataFromPromise = result[index]
 
-          data[dataKey] = dataFromPromise;
+          data[dataKey] = dataFromPromise
         }
 
-        return this.create(table, data);
-      });
+        return this.create(table, data)
+      })
     }
   }
 };
 
-module.exports.Fabricator = Fabricator;
-module.exports.MySQLAdapter = MySQLAdapter;
+module.exports.Fabricator = Fabricator
+module.exports.MySQLAdapter = MySQLAdapter

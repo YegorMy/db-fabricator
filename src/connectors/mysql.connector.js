@@ -1,5 +1,5 @@
-const mysql = require('mysql2/promise');
-const bluebird = require('bluebird');
+const mysql = require('mysql2/promise')
+const bluebird = require('bluebird')
 
 /**
  * @function MySQLConnector
@@ -8,7 +8,7 @@ const bluebird = require('bluebird');
 
 module.exports = (dbConnectionParameters) => {
   if (!dbConnectionParameters.database) {
-    throw new Error('specify database please');
+    throw new Error('specify database please')
   }
 
   return mysql.createConnection({
@@ -16,6 +16,6 @@ module.exports = (dbConnectionParameters) => {
     user: dbConnectionParameters.user || 'root',
     password: dbConnectionParameters.password || '',
     database: dbConnectionParameters.database || 'Ambulnz',
-    Promise: bluebird,
-  });
+    Promise: bluebird
+  })
 }
