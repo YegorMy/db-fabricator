@@ -1,8 +1,8 @@
-const mysqlConnector = require('../connectors/mysql.connector');
-const MySQLHelper = require('../helpers/mysql.helper');
-const Adapter = require('./general.adapter');
-const GeneratedHelper = require('../helpers/mysql-generated.helper');
-const Promise = require('bluebird');
+const mysqlConnector = require('../connectors/mysql.connector')
+const MySQLHelper = require('../helpers/mysql.helper')
+const Adapter = require('./general.adapter')
+const GeneratedHelper = require('../helpers/mysql-generated.helper')
+const Promise = require('bluebird')
 
 /**
  * @class MySQLAdapter
@@ -20,23 +20,23 @@ class MySQLAdapter extends Adapter {
    * @param {boolean} mysqlConnectionParameters.cacheSchema - cache schema for columns
    */
   constructor (mysqlConnectionParameters) {
-    super();
-    const connectionPromise = mysqlConnector(mysqlConnectionParameters);
+    super()
+    const connectionPromise = mysqlConnector(mysqlConnectionParameters)
 
-    this.connectionPromise = connectionPromise.then(this.setConnection.bind(this));
-    this.database = mysqlConnectionParameters.database;
-    this.cacheSchema = mysqlConnectionParameters.cacheSchema;
-    this.__cache = {};
+    this.connectionPromise = connectionPromise.then(this.setConnection.bind(this))
+    this.database = mysqlConnectionParameters.database
+    this.cacheSchema = mysqlConnectionParameters.cacheSchema
+    this.__cache = {}
   }
 
   /**
    * @function MySQLAdapter.waitForConnect
-   * @description Returns promise that will be resolved when connection to DB is established. 
+   * @description Returns promise that will be resolved when connection to DB is established.
    * @returns {Promise<Connection>} - Promise with connection object
    */
 
   waitForConnect () {
-    return this.connectionPromise;
+    return this.connectionPromise
   }
 
   /**
@@ -46,8 +46,8 @@ class MySQLAdapter extends Adapter {
    */
 
   setConnection (connection) {
-    this.connection = connection;
-    return connection;
+    this.connection = connection
+    return connection
   }
   /**
    * @function MySQLAdapter.create
@@ -59,19 +59,19 @@ class MySQLAdapter extends Adapter {
 
   create (table, data) {
     return this.waitForConnect().then(() => {
-      return this.connection.execute(MySQLHelper.generateInsertQuery(table, data)).then(this.renderInsertResults);
-    });
+      return this.connection.execute(MySQLHelper.generateInsertQuery(table, data)).then(this.renderInsertResults)
+    })
   }
 
   /**
    * @function MySQLAdapter.renderInsertResults
    * @description Renders result of the query. Transforms array of objects into array of inserted ids.
-   * @param {QueryResults} results 
+   * @param {QueryResults} results
    * @returns {number[]} - Array of inserted numbers
    */
 
   renderInsertResults (results) {
-    return results.filter(e => e).map(e => Number(e.insertId));
+    return results.filter(e => e).map(e => Number(e.insertId))
   }
 
   /**
@@ -84,8 +84,8 @@ class MySQLAdapter extends Adapter {
 
   remove (table, data) {
     return this.waitForConnect().then(() => {
-      return this.connection.execute(MySQLHelper.generateDeleteQuery(table, data));
-    });
+      return this.connection.execute(MySQLHelper.generateDeleteQuery(table, data))
+    })
   }
 
   /**
@@ -99,24 +99,24 @@ class MySQLAdapter extends Adapter {
     return this.waitForConnect().then(() => {
       const promiseQueue = [
         this.connection.query(MySQLHelper.generateSelectQuery(table, fields, constraints))
-      ];
+      ]
 
       if (hasGenerated && !this.__cache[table]) {
-        promiseQueue.push(this.searchForGeneratedColumns(table));
+        promiseQueue.push(this.searchForGeneratedColumns(table))
       } else if (hasGenerated && this.__cache[table]) {
-        promiseQueue.push(Promise.resolve(this.__cache[table]));
+        promiseQueue.push(Promise.resolve(this.__cache[table]))
       }
 
-      return Promise.all(promiseQueue);
+      return Promise.all(promiseQueue)
     }).then(([data, generatedColumns]) => {
       if (!generatedColumns) {
-        return data;
+        return data
       }
 
-      this.storeGeneratedTablesCache(table, generatedColumns);
+      this.storeGeneratedTablesCache(table, generatedColumns)
 
-      return [data[0], generatedColumns];
-    });
+      return [data[0], generatedColumns]
+    })
   }
 
   /**
@@ -129,8 +129,8 @@ class MySQLAdapter extends Adapter {
 
   update (table, fields, constraints) {
     return this.waitForConnect().then(() => {
-      return this.connection.query(MySQLHelper.generateUpdateQuery(table, fields, constraints));
-    });
+      return this.connection.query(MySQLHelper.generateUpdateQuery(table, fields, constraints))
+    })
   }
 
   /**
@@ -139,18 +139,18 @@ class MySQLAdapter extends Adapter {
    */
 
   disconnect () {
-    return this.waitForConnect().then( () => {
-      return this.connection.connection.close();
-    });
+    return this.waitForConnect().then(() => {
+      return this.connection.connection.close()
+    })
   };
 
   searchForGeneratedColumns (table) {
-    return GeneratedHelper.searchForGeneratedColumns(this.connection, this.database, table);
+    return GeneratedHelper.searchForGeneratedColumns(this.connection, this.database, table)
   };
 
   storeGeneratedTablesCache (table, dataToStore) {
-    this.__cache[table] = dataToStore;
+    this.__cache[table] = dataToStore
   }
 }
 
-module.exports = MySQLAdapter;
+module.exports = MySQLAdapter

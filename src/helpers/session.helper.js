@@ -1,15 +1,15 @@
-const uuid = require('uuid').v4;
+const uuid = require('uuid').v4
 
 /**
  * @class SessionHelper
  */
 class SessionHelper {
   constructor (adapter) {
-    this.sessionStared = false;
-    this.sessionData = {};
-    this.sessions = [];
+    this.sessionStared = false
+    this.sessionData = {}
+    this.sessions = []
 
-    this.adapter = adapter;
+    this.adapter = adapter
   };
 
   /**
@@ -18,8 +18,8 @@ class SessionHelper {
    */
 
   startSession () {
-    this.sessionStared = true;
-    this.sessions.unshift(uuid());
+    this.sessionStared = true
+    this.sessions.unshift(uuid())
   };
 
   /**
@@ -29,15 +29,14 @@ class SessionHelper {
    */
 
   stopSession () {
-    const latestSessionKey = this.getLatestSessionKey();
+    const latestSessionKey = this.getLatestSessionKey()
 
     return this.removeSessionData(latestSessionKey).then(() => {
-      this.removeSession(latestSessionKey);
+      this.removeSession(latestSessionKey)
 
-      return true;
-    });
+      return true
+    })
   };
-
 
   /**
    * @function SessionHelper.getLatestSessionKey
@@ -46,7 +45,7 @@ class SessionHelper {
    */
 
   getLatestSessionKey () {
-    return this.sessions[0];
+    return this.sessions[0]
   };
 
   /**
@@ -57,30 +56,30 @@ class SessionHelper {
    */
 
   saveSessionData (table, insertedData) {
-    const latestSessionKey = this.getLatestSessionKey();
-    
+    const latestSessionKey = this.getLatestSessionKey()
+
     if (!this.sessionStared) {
-      return false;
+      return false
     }
 
     if (!this.sessionData[latestSessionKey]) {
-      this.sessionData[latestSessionKey] = {};
+      this.sessionData[latestSessionKey] = {}
     }
 
     if (!this.sessionData[latestSessionKey][table]) {
-      this.sessionData[latestSessionKey][table] = [];
+      this.sessionData[latestSessionKey][table] = []
     }
 
     if (insertedData instanceof Array) {
       if (insertedData.length === 1) {
-        this.sessionData[latestSessionKey][table].push(insertedData[0]);
+        this.sessionData[latestSessionKey][table].push(insertedData[0])
       } else {
         for (const data of insertedData) {
-          this.sessionData[latestSessionKey][table].push(data);
+          this.sessionData[latestSessionKey][table].push(data)
         }
       }
     } else {
-      this.sessionData[latestSessionKey][table].push(insertedData);
+      this.sessionData[latestSessionKey][table].push(insertedData)
     }
   };
 
@@ -91,18 +90,18 @@ class SessionHelper {
    */
 
   removeSessionData (sessionKey) {
-    const promiseQueue = [];
-    const sessionData = this.sessionData[sessionKey];
+    const promiseQueue = []
+    const sessionData = this.sessionData[sessionKey]
     if (!sessionData) {
-      return Promise.resolve(true);
+      return Promise.resolve(true)
     }
-    const sessionDataKeys = Object.keys(sessionData);
+    const sessionDataKeys = Object.keys(sessionData)
 
     for (const key of sessionDataKeys) {
-      this.renderSessionData(key, sessionData[key], promiseQueue);
+      this.renderSessionData(key, sessionData[key], promiseQueue)
     }
 
-    return Promise.all(promiseQueue);
+    return Promise.all(promiseQueue)
   };
 
   /**
@@ -115,59 +114,59 @@ class SessionHelper {
 
   renderSessionData (table, values, promiseQueue) {
     if (!values.length) {
-      return;
+      return
     }
-    const toDelete = [];
-    const toUpdate = [];
+    const toDelete = []
+    const toUpdate = []
 
     // if element of the value is simple number, that means we need to delete it.
     // if element of the value is an object, we need to modify it by id
 
     for (const element of values) {
       if (typeof element === 'number' || typeof element === 'string') {
-        toDelete.push(element);
-        continue;
+        toDelete.push(element)
+        continue
       }
 
       // console.log(element);
 
-      toUpdate.push(element);
+      toUpdate.push(element)
     }
 
     for (const element of toUpdate) {
       if (toDelete.indexOf(element.id) === -1) {
         if (element.__insert) {
-          delete element.__insert;
+          delete element.__insert
 
-          promiseQueue.push(this.adapter.create(table, element));
+          promiseQueue.push(this.adapter.create(table, element))
         } else {
-          const elementId = element.id; // save id
-          delete element.id; // we don't want to update id for the element
+          const elementId = element.id // save id
+          delete element.id // we don't want to update id for the element
 
-          promiseQueue.push(this.adapter.update(table, element, elementId));
+          promiseQueue.push(this.adapter.update(table, element, elementId))
         }
       }
     }
 
     for (const element of toDelete) {
-      promiseQueue.push(this.adapter.remove(table, element));
+      promiseQueue.push(this.adapter.remove(table, element))
     }
 
-    return promiseQueue;
+    return promiseQueue
   };
 
   /**
    * @function SessionHelper.removeSession
-   * @description Removes session from local session key value storage. 
-   * @param {string} sessionKey 
+   * @description Removes session from local session key value storage.
+   * @param {string} sessionKey
    */
 
   removeSession (sessionKey) {
-    this.sessions.splice(this.sessions.indexOf(sessionKey), 1);
-    delete this.sessionData[sessionKey];
+    this.sessions.splice(this.sessions.indexOf(sessionKey), 1)
+    delete this.sessionData[sessionKey]
 
     if (!this.sessions.length) {
-      this.sessionStared = false;
+      this.sessionStared = false
     }
   };
 
@@ -179,11 +178,11 @@ class SessionHelper {
 
   stopAllSessions () {
     if (!this.sessions.length) {
-      return Promise.resolve(true);
+      return Promise.resolve(true)
     }
 
-    return this.stopSession().then(this.stopAllSessions.bind(this));
+    return this.stopSession().then(this.stopAllSessions.bind(this))
   };
 };
 
-module.exports = SessionHelper;
+module.exports = SessionHelper

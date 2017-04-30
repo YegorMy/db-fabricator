@@ -1,5 +1,5 @@
-const MySQLHelper = require('./mysql.helper');
-const clone = require('lodash.clone');
+const MySQLHelper = require('./mysql.helper')
+const clone = require('lodash.clone')
 
 const GeneratedHelper = {
   searchForGeneratedColumns (connection, database, tableName) {
@@ -15,56 +15,56 @@ const GeneratedHelper = {
           $like: '%VIRTUAL%'
         }
       }]
-    });
+    })
 
-    return connection.query(query).then(data => data[0]).then(this.createGeneratedKV);
+    return connection.query(query).then(data => data[0]).then(this.createGeneratedKV)
   },
 
   createGeneratedKV (data) {
-    const generatedKV = {};
+    const generatedKV = {}
 
     for (const element of data) {
-      generatedKV[element.COLUMN_NAME] = true;
+      generatedKV[element.COLUMN_NAME] = true
     }
 
-    return generatedKV;
+    return generatedKV
   },
 
   renderQueryResultWithGeneratedColumns (data, generatedColumns) {
-    const columnsDescription = data[1];
+    const columnsDescription = data[1]
 
     for (const key in columnsDescription) {
-      columnsDescription[key] = columnsDescription[key].inspect();
-      const column = columnsDescription[key];
-      
+      columnsDescription[key] = columnsDescription[key].inspect()
+      const column = columnsDescription[key]
+
       if (generatedColumns[column.orgName]) {
-        column.generated = true;
+        column.generated = true
       }
     }
 
-    return data;
+    return data
   },
 
   createDataToStoreInSession (initialData, generatedColumns) {
-    const dataToStoreInSession = [];
+    const dataToStoreInSession = []
 
     for (const i in initialData) {
-      const el = clone(initialData[i]);
+      const el = clone(initialData[i])
 
-      const keys = Object.keys(el);
+      const keys = Object.keys(el)
 
       for (const key of keys) {
         if (generatedColumns[key]) {
-          delete el[key];
+          delete el[key]
         }
       }
 
-      el.__insert = true;
-      dataToStoreInSession.push(el);
+      el.__insert = true
+      dataToStoreInSession.push(el)
     }
 
-    return dataToStoreInSession;
+    return dataToStoreInSession
   }
-};
+}
 
-module.exports = GeneratedHelper;
+module.exports = GeneratedHelper
