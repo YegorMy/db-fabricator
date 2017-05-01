@@ -109,7 +109,7 @@ class Fabricator {
         updateQueue.push(this.adapter.update(table, updateData, idList));
       }
 
-      return BBPromise.all(updateQueue);
+      return Promise.all(updateQueue);
     });
   };
 
