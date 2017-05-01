@@ -17,7 +17,6 @@
     "fabrication",
     "mysql",
     "integration",
-    "test",
     "test"
   ],
   "author": "yegormy <egorsm00@gmail.com>",
@@ -28,10 +27,12 @@
   "homepage": "https://github.com/YegorMy/db-fabricator#readme",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "chai": "^3.5.0",
     "lodash.clone": "^4.5.0",
-    "mocha": "^3.3.0",
     "mysql2": "^1.2.0",
     "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.3.0"
   }
 }
