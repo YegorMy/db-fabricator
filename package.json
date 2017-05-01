@@ -1,6 +1,6 @@
 {
   "name": "db-fabricate",
-  "version": "1.0.10.1",
+  "version": "1.0.11",
   "description": "Fabricate data in your MySQL DB",
   "main": "index.js",
   "scripts": {
