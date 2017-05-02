@@ -84,11 +84,7 @@ class MySQLAdapter extends Adapter {
 
   remove (table, data) {
     return this.waitForConnect().then(() => {
-      return this.connection.execute(`
-        SET foreign_key_checks = 0;
-        ${MySQLHelper.generateDeleteQuery(table, data)};
-        SET foreign_key_checks = 1;
-      `);
+      return this.connection.execute(MySQLHelper.generateDeleteQuery(table, data));
     });
   }
 
@@ -157,7 +153,7 @@ class MySQLAdapter extends Adapter {
   }
 
   setForeignKeyChecks (value = 0) {
-    return this.connection.execute(`SET GLOBAL foreign_key_checks = ${value}`);
+    return this.connection.query(`SET GLOBAL foreign_key_checks = ${value}`);
   }
 }
 
