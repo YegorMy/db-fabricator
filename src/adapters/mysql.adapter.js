@@ -151,6 +151,10 @@ class MySQLAdapter extends Adapter {
   storeGeneratedTablesCache (table, dataToStore) {
     this.__cache[table] = dataToStore;
   }
+
+  setForeignKeyChecks (value = 0) {
+    return this.connection.execute(`SET GLOBAL foreign_key_checks = ${value}`);
+  }
 }
 
 module.exports = MySQLAdapter;
