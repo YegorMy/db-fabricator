@@ -102,7 +102,7 @@ class SessionHelper {
       this.renderSessionData(key, sessionData[key], promiseQueue);
     }
 
-    return this.adapter.setForeignKeyChecks().then(() => Promise.all(promiseQueue)).then(() => this.adapter.setForeignKeyChecks(1));
+    return Promise.all(promiseQueue);
   };
 
   /**

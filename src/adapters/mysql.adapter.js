@@ -84,7 +84,11 @@ class MySQLAdapter extends Adapter {
 
   remove (table, data) {
     return this.waitForConnect().then(() => {
-      return this.connection.execute(MySQLHelper.generateDeleteQuery(table, data));
+      return this.connection.execute(`
+        SET foreign_key_checks = 0;
+        ${MySQLHelper.generateDeleteQuery(table, data)};
+        SET foreign_key_checks = 1;
+      `);
     });
   }
 
