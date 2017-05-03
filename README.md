@@ -198,8 +198,9 @@ template({value1: 'replaced value'}).then(id => {
 });
 
 ```
-You can insert functions that returns some value based on object or function that returns other templates as a fields to templates: **implemented at 1.0.14**
-```
+You can insert functions that returns some value based on object or function that returns other templates as a fields to templates: **implemented at 1.0.14**:
+
+```javascript
 const organizationTemplate = Fabricator.createTemplate('TestTable', {
   name: 'Horns and Hooves LTD'
 });
