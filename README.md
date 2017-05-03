@@ -198,10 +198,7 @@ template({value1: 'replaced value'}).then(id => {
 });
 
 ```
-
-_TO IMPLEMENT:_ Allow templates use another templates and store related IDs.
-
-**NOT IMPLEMENTED YET**
+You can insert functions that returns some value based on object or function that returns other templates as a fields to templates: **implemented at 1.0.14**
 ```
 const organizationTemplate = Fabricator.createTemplate('TestTable', {
   name: 'Horns and Hooves LTD'
@@ -210,7 +207,8 @@ const organizationTemplate = Fabricator.createTemplate('TestTable', {
 const userTemplate = Fabricator.createTemplate('TestTable', {
   firstName: 'John',
   lastName: 'Smith',
-  organizationId: () => organizationTemplate()
+  organizationId: () => organizationTemplate(),
+  email: (obj) => `${obj.firstName}@gmail.com`
 });
 
 Fabricator.startSession();
@@ -220,6 +218,14 @@ userTemplate({lastName: 'Lee'}).then(id => {
   
   Fabricator.closeConnection(); // both organization and user will be removed from database
 });
+```
+
+`obj` in function argument is an object with all *pure* data you passed into tempmate. In this case it will be
+```javascript
+{
+  firstName: 'John',
+  lastName: 'Smith'
+}
 ```
 
 # <a name="constraints"></a> Constraints for `Fabricator.update`
