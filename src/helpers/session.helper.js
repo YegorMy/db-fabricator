@@ -58,7 +58,7 @@ class SessionHelper {
 
   saveSessionData (table, insertedData) {
     const latestSessionKey = this.getLatestSessionKey();
-    
+
     if (!this.sessionStared) {
       return false;
     }
@@ -98,7 +98,7 @@ class SessionHelper {
     }
     const sessionDataKeys = Object.keys(sessionData);
 
-    for (const key of sessionDataKeys) {
+    for (const key of sessionDataKeys.reverse()) {
       this.renderSessionData(key, sessionData[key], promiseQueue);
     }
 
@@ -158,8 +158,8 @@ class SessionHelper {
 
   /**
    * @function SessionHelper.removeSession
-   * @description Removes session from local session key value storage. 
-   * @param {string} sessionKey 
+   * @description Removes session from local session key value storage.
+   * @param {string} sessionKey
    */
 
   removeSession (sessionKey) {
